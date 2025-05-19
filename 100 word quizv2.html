@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Burarra Vocabulary Quiz</title>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+  .question {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .options button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .options button.correct {
+    background-color: lightgreen;
+  }
+  .options button.incorrect {
+    background-color: lightcoral;
+  }
+  #results {
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  #score-display {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h1>Burarra Vocabulary Quiz</h1>
+
+<div id="score-display">Score: 0</div>
+
+<div id="quiz-container">
+  </div>
+
+
+<div id="results"></div>
+
+<script>
+const vocabulary = [
+  {
+    "burarra": "Wangarr",
+    "frequency": 1,
+    "english": "God",
+    "audio": "audio/Wangarr.mp3"
+  },
+  {
+    "burarra": "gu-jarlapuna",
+    "frequency": 1,
+    "english": "created",
+    "audio": "audio/gu-jarlapuna.mp3"
+  },
+  {
+    "burarra": "rrapa",
+    "frequency": 1,
+    "english": "and",
+    "audio": "audio/rrapa.mp3"
+  },
+  {
+    "burarra": "nipa",
+    "frequency": 16,
+    "english": "he/she/it (that one)",
+    "audio": "audio/nipa.mp3"
+  },
+  {
+    "burarra": "waykin",
+    "frequency": 15,
+    "english": "above",
+    "audio": "audio/waykin.mp3"
+  },
+  {
+    "burarra": "wupa",
+    "frequency": 12,
+    "english": "below",
+    "audio": "audio/a-wupa.mp3"
+  },
+  {
+    "burarra": "gu-nana",
+    "frequency": 8,
+    "english": "he/she/it saw",
+    "audio": "audio/gu-jarlapuna.mp3"
+  },
+  {
+    "burarra": "gun-nardiya",
+    "frequency": 8,
+    "english": "this (thing/it)",
+    "audio": "audio/gun-nardiya.mp3"
+  },
+  {
+    "burarra": "rrawa",
+    "frequency": 8,
+    "english": "ground, land, place",
+    "audio": "audio/rrawa.mp3"
+  },
+  {
+    "burarra": "gu-ni",
+    "frequency": 8,
+    "english": "it is/was",
+    "audio": "audio/gu-ni.mp3"
+  },
+  {
+    "burarra": "lika",
+    "frequency": 8,
+    "english": "then",
+    "audio": "audio/lika.mp3"
+  },
+  {
+    "burarra": "an-gata",
+    "frequency": 7,
+    "english": "that (animate being)",
+    "audio": "audio/an-gata.mp3"
+  },
+  {
+    "burarra": "a-wena",
+    "frequency": 7,
+    "english": "he/she/it spoke/said",
+    "audio": "audio/a-wena.mp3"
+  },
+  {
+    "burarra": "gun-ngardapa",
+    "frequency": 7,
+    "english": "one, first",
+    "audio": "audio/gun-ngardapa.mp3"
+  },
+  {
+    "burarra": "barra",
+    "frequency": 7,
+    "english": "will, shall, future tense marker",
+    "audio": "audio/barra.mp3"
+  },
+  {
+    "burarra": "gu-gurda",
+    "frequency": 6,
+    "english": "like that, in that way",
+    "audio": "audio/gu-gurda.mp3"
+  },
+  {
+    "burarra": "ngacha",
+    "frequency": 6,
+    "english": "just, only",
+    "audio": "audio/ngacha.mp3"
+  },
+  {
+    "burarra": "an-guyinda",
+    "frequency": 6,
+    "english": "of/belonging to him/her/it",
+    "audio": "audio/an-guyinda.mp3"
+  },
+  {
+    "burarra": "waykin",
+    "frequency": 5,
+    "english": "sky",
+    "audio": "audio/waykin.mp3"
+  },
+  {
+    "burarra": "wupa",
+    "frequency": 5,
+    "english": "water",
+    "audio": "audio/wupa.mp3"
+  },
+  {
+    "burarra": "bugula",
+    "frequency": 5,
+    "english": "ground, dirt",
+    "audio": "audio/bugula.mp3"
+  },
+  {
+    "burarra": "a-yinagata",
+    "frequency": 5,
+    "english": "he/she/it said (variant)",
+    "audio": "audio/a-yinagata.mp3"
+  },
+  {
+    "burarra": "gun-nelangga",
+    "frequency": 5,
+    "english": "its/his/her name is/was",
+    "audio": "audio/gun-nelangga.mp3"
+  },
+  {
+    "burarra": "ngardapa",
+    "frequency": 5,
+    "english": "one, first, alone",
+    "audio": "audio/ngardapa.mp3"
+  },
+  {
+    "burarra": "gun-molamola",
+    "frequency": 5,
+    "english": "good",
+    "audio": "audio/gun-molamola.mp3"
+  },
+  {
+    "burarra": "gu-maya",
+    "frequency": 2,
+    "english": "unknown",
+    "audio": "audio/gu-maya.mp3"
+  }
+];
+
+const quizContainer = document.getElementById('quiz-container');
+const resultsContainer = document.getElementById('results');
+const scoreDisplay = document.getElementById('score-display');
+let currentQuestionIndex = 0;
+let score = 0;
+let currentAudio; // To keep track of the currently playing audio
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function playAudio(audioPath) {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+  currentAudio = new Audio(audioPath);
+  currentAudio.play();
+}
+
+function displayQuestion() {
+  scoreDisplay.textContent = `Score: ${score}`;
+  const currentQuestionData = vocabulary[currentQuestionIndex];
+  const questionDiv = document.createElement('div');
+  questionDiv.classList.add('question');
+
+  const englishWord = document.createElement('h2');
+  englishWord.textContent = currentQuestionData.english;
+  questionDiv.appendChild(englishWord);
+
+  const optionsDiv = document.createElement('div');
+  optionsDiv.classList.add('options');
+
+  const correctBurarra = currentQuestionData.burarra;
+  const allOptions = [correctBurarra];
+
+  while (allOptions.length < 4) {
+    const randomIndex = Math.floor(Math.random() * vocabulary.length);
+    const randomBurarraData = vocabulary[randomIndex];
+    if (!allOptions.includes(randomBurarraData.burarra)) {
+      allOptions.push(randomBurarraData.burarra);
+    }
+  }
+
+  shuffleArray(allOptions);
+
+  allOptions.forEach(option => {
+    const optionButton = document.createElement('button');
+    optionButton.textContent = option;
+    const wordData = vocabulary.find(item => item.burarra === option);
+    if (wordData && wordData.audio) {
+      optionButton.addEventListener('mouseover', () => playAudio(wordData.audio));
+    }
+    optionButton.addEventListener('click', () => checkAnswer(option, correctBurarra, optionButton));
+    optionsDiv.appendChild(optionButton);
+  });
+
+  questionDiv.appendChild(optionsDiv);
+  quizContainer.innerHTML = '';
+  quizContainer.appendChild(questionDiv);
+}
+
+function checkAnswer(selectedAnswer, correctAnswer, selectedButton) {
+  const optionsButtons = selectedButton.parentNode.querySelectorAll('button');
+  optionsButtons.forEach(button => {
+    button.disabled = true;
+    if (button.textContent === correctAnswer) {
+      button.classList.add('correct');
+    } else if (button.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
+      button.classList.add('incorrect');
+    }
+  });
+
+  if (selectedAnswer === correctAnswer) {
+    score++;
+    scoreDisplay.textContent = `Score: ${score}`;
+  }
+
+  currentQuestionIndex++;
+
+  if (currentQuestionIndex < vocabulary.length) {
+    setTimeout(displayQuestion, 1500);
+  } else {
+    displayResults();
+  }
+}
+
+function displayResults() {
+  quizContainer.innerHTML = `<h2>Quiz Finished!</h2><p>Your final score is: ${score} out of ${vocabulary.length}</p>`;
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+}
+
+// Start the quiz
+shuffleArray(vocabulary);
+displayQuestion();
+
+</script>
+
+</body>
+</html>
