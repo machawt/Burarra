@@ -2,36 +2,158 @@
 <html>
 <head>
 <title>Burarra Vocabulary Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     font-family: sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    -webkit-tap-highlight-color: transparent; /* Remove default tap highlight */
+  }
+  #menu, #quiz-container, #results {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  #menu h2, #quiz-container h2, #results h2 {
+    color: #555;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  #menu button {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  #menu button:hover {
+    background-color: #0056b3;
   }
   .question {
     margin-bottom: 20px;
     padding: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 5px;
+    background-color: #eee;
+  }
+  .question h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .options button {
+    flex: 1 1 calc(50% - 5px); /* Two buttons per row on wider screens */
     padding: 10px 15px;
-    margin-right: 10px;
     border: 1px solid #aaa;
     border-radius: 3px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  .options button:hover {
+    background-color: #f0f0f0;
   }
   .options button.correct {
     background-color: lightgreen;
+    border-color: darkgreen;
+    color: darkgreen;
   }
   .options button.incorrect {
     background-color: lightcoral;
-  }
-  #results {
-    margin-top: 20px;
-    font-weight: bold;
+    border-color: darkred;
+    color: darkred;
   }
   #score-display {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     font-weight: bold;
+    text-align: center;
+    font-size: 1.1em;
+  }
+  #results p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  #results ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  #results li {
+    margin-bottom: 5px;
+  }
+  #results button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  #results button:last-child {
+    background-color: #007bff;
+  }
+  #results button:hover {
+    background-color: #1e7e34;
+  }
+  #results button:last-child:hover {
+    background-color: #0056b3;
+  }
+  .selected {
+    border: 3px solid blue !important;
+  }
+
+  /* Media query for smaller screens (e.g., phones) */
+  @media (max-width: 480px) {
+    #menu, #quiz-container, #results {
+      margin: 15px;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    #menu h2, #quiz-container h2, #results h2 {
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+    .options button {
+      flex: 1 1 100%; /* One button per row on small screens */
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    #score-display {
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+    #results p, #results li {
+      font-size: 0.95em;
+    }
+    #results button {
+      font-size: 14px;
+      padding: 8px 12px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
   }
 </style>
 </head>
@@ -39,180 +161,224 @@
 
 <h1>Burarra Vocabulary Quiz</h1>
 
-<div id="score-display">Score: 0</div>
+<div id="menu">
+  <h2>Choose a Vocabulary Set:</h2>
+</div>
 
-<div id="quiz-container">
-  </div>
+<div id="quiz-container" class="hidden">
+  <div id="score-display"></div>
+</div>
 
-
-<div id="results"></div>
+<div id="results" class="hidden"></div>
 
 <script>
-const vocabulary = [
-  {
-    "burarra": "Wangarr",
-    "frequency": 1,
-    "english": "God",
-    "audio": "audio/Wangarr.mp3"
-  },
-  {
-    "burarra": "gu-jarlapuna",
-    "frequency": 1,
-    "english": "created",
-    "audio": "audio/gu-jarlapuna.mp3"
-  },
-  {
-    "burarra": "rrapa",
-    "frequency": 1,
-    "english": "and",
-    "audio": "audio/rrapa.mp3"
-  },
-  {
-    "burarra": "nipa",
-    "frequency": 16,
-    "english": "he/she/it (that one)",
-    "audio": "audio/nipa.mp3"
-  },
-  {
-    "burarra": "waykin",
-    "frequency": 15,
-    "english": "above",
-    "audio": "audio/waykin.mp3"
-  },
-  {
-    "burarra": "wupa",
-    "frequency": 12,
-    "english": "below",
-    "audio": "audio/a-wupa.mp3"
-  },
-  {
-    "burarra": "gu-nana",
-    "frequency": 8,
-    "english": "he/she/it saw",
-    "audio": "audio/gu-jarlapuna.mp3"
-  },
-  {
-    "burarra": "gun-nardiya",
-    "frequency": 8,
-    "english": "this (thing/it)",
-    "audio": "audio/gun-nardiya.mp3"
-  },
-  {
-    "burarra": "rrawa",
-    "frequency": 8,
-    "english": "ground, land, place",
-    "audio": "audio/rrawa.mp3"
-  },
-  {
-    "burarra": "gu-ni",
-    "frequency": 8,
-    "english": "it is/was",
-    "audio": "audio/gu-ni.mp3"
-  },
-  {
-    "burarra": "lika",
-    "frequency": 8,
-    "english": "then",
-    "audio": "audio/lika.mp3"
-  },
-  {
-    "burarra": "an-gata",
-    "frequency": 7,
-    "english": "that (animate being)",
-    "audio": "audio/an-gata.mp3"
-  },
-  {
-    "burarra": "a-wena",
-    "frequency": 7,
-    "english": "he/she/it spoke/said",
-    "audio": "audio/a-wena.mp3"
-  },
-  {
-    "burarra": "gun-ngardapa",
-    "frequency": 7,
-    "english": "one, first",
-    "audio": "audio/gun-ngardapa.mp3"
-  },
-  {
-    "burarra": "barra",
-    "frequency": 7,
-    "english": "will, shall, future tense marker",
-    "audio": "audio/barra.mp3"
-  },
-  {
-    "burarra": "gu-gurda",
-    "frequency": 6,
-    "english": "like that, in that way",
-    "audio": "audio/gu-gurda.mp3"
-  },
-  {
-    "burarra": "ngacha",
-    "frequency": 6,
-    "english": "just, only",
-    "audio": "audio/ngacha.mp3"
-  },
-  {
-    "burarra": "an-guyinda",
-    "frequency": 6,
-    "english": "of/belonging to him/her/it",
-    "audio": "audio/an-guyinda.mp3"
-  },
-  {
-    "burarra": "waykin",
-    "frequency": 5,
-    "english": "sky",
-    "audio": "audio/waykin.mp3"
-  },
-  {
-    "burarra": "wupa",
-    "frequency": 5,
-    "english": "water",
-    "audio": "audio/wupa.mp3"
-  },
-  {
-    "burarra": "bugula",
-    "frequency": 5,
-    "english": "ground, dirt",
-    "audio": "audio/bugula.mp3"
-  },
-  {
-    "burarra": "a-yinagata",
-    "frequency": 5,
-    "english": "he/she/it said (variant)",
-    "audio": "audio/a-yinagata.mp3"
-  },
-  {
-    "burarra": "gun-nelangga",
-    "frequency": 5,
-    "english": "its/his/her name is/was",
-    "audio": "audio/gun-nelangga.mp3"
-  },
-  {
-    "burarra": "ngardapa",
-    "frequency": 5,
-    "english": "one, first, alone",
-    "audio": "audio/ngardapa.mp3"
-  },
-  {
-    "burarra": "gun-molamola",
-    "frequency": 5,
-    "english": "good",
-    "audio": "audio/gun-molamola.mp3"
-  },
-  {
-    "burarra": "gu-maya",
-    "frequency": 2,
-    "english": "unknown",
-    "audio": "audio/gu-maya.mp3"
-  }
+const allVocabulary = [
+  { "burarra": "Jesus", "english": "Jesus", "audio": "audio/jesus.mp3" },
+  { "burarra": "Bugula", "english": "ground, dirt", "audio": "audio/bugula.mp3" },
+  { "burarra": "Gu-jarlapuna", "english": "he/she/it created/made", "audio": "audio/gu-jarlapuna.mp3" },
+  { "burarra": "Gurnal", "english": "unknown", "audio": "audio/gurnal.mp3" },
+  { "burarra": "Mun-girra", "english": "unknown", "audio": "audio/mun-girra.mp3" },
+  { "burarra": "Mu-ni", "english": "it is/was", "audio": "audio/mu-ni.mp3" },
+  { "burarra": "Minypa", "english": "like, as, similar to", "audio": "audio/minypa.mp3" },
+  { "burarra": "Wayin", "english": "wine", "audio": "audio/wayin.mp3" },
+  { "burarra": "Nuwurra", "english": "unknown", "audio": "audio/nuwurra.mp3" },
+  { "burarra": "waypa", "english": "water", "audio": "audio/waypa.mp3" },
+  { "burarra": "ngorrngurra", "english": "night, darkness", "audio": "audio/ngorrngurra.mp3" },
+  { "burarra": "abirri-jirrapa", "english": "two", "audio": "audio/abirri-jirrapa.mp3" },
+  { "burarra": "gu-ni", "english": "it is/was", "audio": "audio/gu-ni.mp3" },
+  { "burarra": "janara", "english": "that (plural)", "audio": "audio/janara.mp3" },
+  { "burarra": "gu-ji", "english": "it is/was", "audio": "audio/gu-ji.mp3" },
+  { "burarra": "gun-gaba", "english": "unknown", "audio": "audio/gun-gaba.mp3" },
+  { "burarra": "rrawa", "english": "ground, land, place", "audio": "audio/rrawa.mp3" },
+  { "burarra": "wana", "english": "child, offspring", "audio": "audio/wana.mp3" },
+  { "burarra": "gu-bapala", "english": "big", "audio": "audio/gu-bapala.mp3" },
+  { "burarra": "an-ngardapa", "english": "one, first", "audio": "audio/an-ngardapa.mp3" },
+  { "burarra": "an-gugaliya", "english": "man", "audio": "audio/an-gugaliya.mp3" },
+  { "burarra": "jiny-ma", "english": "she/it (feminine) gives/does", "audio": "audio/jiny-ma.mp3" },
+  { "burarra": "barra", "english": "will, shall, future tense marker", "audio": "audio/barra.mp3" },
+  { "burarra": "jin-nigipa", "english": "his/her/its (feminine)", "audio": "audio/jin-nigipa.mp3" },
+  { "burarra": "gochila gochila", "english": "child, small", "audio": "audio/gochila-gochila.mp3" },
+  { "burarra": "jin-gurra", "english": "unknown (feminine)", "audio": "audio/jin-gurra.mp3" },
+  { "burarra": "mampa", "english": "that (animate)", "audio": "audio/mampa.mp3" },
+  { "burarra": "niya", "english": "he/she/it (that one)", "audio": "audio/niya.mp3" },
+  { "burarra": "jinyu-ni", "english": "she/it (feminine) is/was", "audio": "audio/jinyu-ni.mp3" },
+  { "burarra": "aburr-gonyjinga", "english": "they named/called", "audio": "audio/aburr-gonyjinga.mp3" },
+  { "burarra": "burrwa", "english": "they (animate plural)", "audio": "audio/burrwa.mp3" },
+  { "burarra": "aburr-yigipa", "english": "their (animate plural)", "audio": "audio/aburr-yigipa.mp3" },
+  { "burarra": "jawina", "english": "children, offspring", "audio": "audio/jawina.mp3" },
+  { "burarra": "yerrcha", "english": "people, person", "audio": "audio/yerrcha.mp3" },
+  { "burarra": "gun-gatiya", "english": "that (thing/it)", "audio": "audio/gun-gatiya.mp3" },
+  { "burarra": "mun-gata", "english": "that (thing/it, different class)", "audio": "audio/mun-gata.mp3" },
+  { "burarra": "mu-wulebiyana", "english": "it ran out", "audio": "audio/mu-wulebiyana.mp3" },
+  { "burarra": "jiny-yena", "english": "she/it (feminine) said/spoke to", "audio": "audio/jiny-yena.mp3" },
+  { "burarra": "nula", "english": "to him/her/it", "audio": "audio/nula.mp3" },
+  { "burarra": "a-lay", "english": "hey, oh", "audio": "audio/a-lay.mp3" },
+  { "burarra": "gun-nyagara", "english": "unknown", "audio": "audio/gun-nyagara.mp3" },
+  { "burarra": "a-yinanga", "english": "he/she/it said", "audio": "audio/a-yinanga.mp3" },
+  { "burarra": "achila", "english": "mother", "audio": "audio/achila.mp3" },
+  { "burarra": "ngaypa", "english": "I, me", "audio": "audio/ngaypa.mp3" },
+  { "burarra": "ngika", "english": "not", "audio": "audio/ngika.mp3" },
+  { "burarra": "nguna-barnja", "english": "I don't know", "audio": "audio/nguna-barnja.mp3" },
+  { "burarra": "wurra", "english": "but", "audio": "audio/wurra.mp3" },
+  { "burarra": "gala", "english": "not", "audio": "audio/gala.mp3" },
+  { "burarra": "burdak", "english": "only, just", "audio": "audio/burdak.mp3" },
+  { "burarra": "gun-mola", "english": "good", "audio": "audio/gun-mola.mp3" },
+  { "burarra": "gu-nirrarnapa", "english": "unknown", "audio": "audio/gu-nirrarnapa.mp3" },
+  { "burarra": "apula", "english": "now", "audio": "audio/apula.mp3" },
+  { "burarra": "lika", "english": "then", "audio": "audio/lika.mp3" },
+  { "burarra": "jin-gata", "english": "that (feminine)", "audio": "audio/jin-gata.mp3" },
+  { "burarra": "burrwa", "english": "they (animate plural)", "audio": "audio/burrwa.mp3" },
+  { "burarra": "aburr-mujama", "english": "their (plural) work/activity", "audio": "audio/aburr-mujama.mp3" },
+  { "burarra": "an-guna", "english": "that (animate)", "audio": "audio/an-guna.mp3" },
+  { "burarra": "a-yinmiya", "english": "he/she/it does/says", "audio": "audio/a-yinmiya.mp3" },
+  { "burarra": "a-wengga", "english": "he/she/it speaks/says", "audio": "audio/a-wengga.mp3" },
+  { "burarra": "ana-goyburrpa", "english": "how many/much", "audio": "audio/ana-goyburrpa.mp3" },
+  { "burarra": "jama", "english": "work, activity", "audio": "audio/jama.mp3" },
+  { "burarra": "nyiburr-ji", "english": "we (plural inclusive) are", "audio": "audio/nyiburr-ji.mp3" },
+  { "burarra": "japalana", "english": "stone, container", "audio": "audio/japalana.mp3" },
+  { "burarra": "yi-gurrepa", "english": "unknown", "audio": "audio/yi-gurrepa.mp3" },
+  { "burarra": "a-ji", "english": "he/she/it is/was", "audio": "audio/a-ji.mp3" },
+  { "burarra": "jandarra", "english": "unknown", "audio": "audio/jandarra.mp3" },
+  { "burarra": "gubi-jarlapuna", "english": "they (thing) created/made", "audio": "audio/gubi-jarlapuna.mp3" },
+  { "burarra": "nula", "english": "to him/her/it", "audio": "audio/nula.mp3" },
+  { "burarra": "Ju", "english": "Jew", "audio": "audio/ju.mp3" },
+  { "burarra": "aburr-gurragiya", "english": "they were preparing", "audio": "audio/aburr-gurragiya.mp3" },
+  { "burarra": "aburr-workiya", "english": "they worked/did", "audio": "audio/aburr-workiya.mp3" },
+  { "burarra": "wana", "english": "child, offspring", "audio": "audio/wana.mp3" },
+  { "burarra": "an-babalapa", "english": "big", "audio": "audio/an-babalapa.mp3" },
+  { "burarra": "minypa", "english": "like, as, similar to", "audio": "audio/minypa.mp3" },
+  { "burarra": "duram", "english": "drum", "audio": "audio/duram.mp3" },
+  { "burarra": "a-yinanga", "english": "he/she/it said", "audio": "audio/a-yinanga.mp3" },
+  { "burarra": "bugula", "english": "ground, dirt", "audio": "audio/bugula.mp3" },
+  { "burarra": "ana-werranga", "english": "how many/much", "audio": "audio/ana-werranga.mp3" },
+  { "burarra": "bubu-wemba", "english": "you (plural) fill", "audio": "audio/bubu-wemba.mp3" },
+  { "burarra": "ana-guna", "english": "that (thing)", "audio": "audio/ana-guna.mp3" },
+  { "burarra": "bubi-jerrjerrja", "english": "you (plural) pour", "audio": "audio/bubi-jerrjerrja.mp3" },
+  { "burarra": "gu-ngana", "english": "unknown", "audio": "audio/gu-ngana.mp3" },
+  { "burarra": "bubu-ma", "english": "you (plural) give/do", "audio": "audio/bubu-ma.mp3" },
+  { "burarra": "birripa", "english": "they (animate plural)", "audio": "audio/birripa.mp3" },
+  { "burarra": "aburr-garlmuna", "english": "they came", "audio": "audio/aburr-garlmuna.mp3" },
+  { "burarra": "gubu-wembarra", "english": "they (thing) filled", "audio": "audio/gubu-wembarra.mp3" },
+  { "burarra": "gubi-jerrjerrjinga", "english": "they (thing) poured", "audio": "audio/gubi-jerrjerrjinga.mp3" },
+  { "burarra": "ana-bapala", "english": "big", "audio": "audio/ana-bapala.mp3" },
+  { "burarra": "a-wena", "english": "he/she/it spoke/said", "audio": "audio/a-wena.mp3" },
+  { "burarra": "mola", "english": "also", "audio": "audio/mola.mp3" },
+  { "burarra": "a-yinagata", "english": "he/she/it said (variant)", "audio": "audio/a-yinagata.mp3" },
+  { "burarra": "gipa", "english": "now", "audio": "audio/gipa.mp3" },
+  { "burarra": "nyibi-jerrjerrjinga", "english": "we (dual inclusive) poured", "audio": "audio/nyibi-jerrjerrjinga.mp3" },
+  { "burarra": "gun-delipa", "english": "liquid, water (can be general)", "audio": "audio/gun-delipa.mp3" },
+  { "burarra": "bubu-wemba", "english": "you (plural) fill", "audio": "audio/bubu-wemba.mp3" },
+  { "burarra": "bubu-ga", "english": "you (plural) take", "audio": "audio/bubu-ga.mp3" },
+  { "burarra": "an-gurrimapa", "english": "leader, boss", "audio": "audio/an-gurrimapa.mp3" },
+  { "burarra": "gubu-ganyja", "english": "they (thing) took/held", "audio": "audio/gubu-ganyja.mp3" },
+  { "burarra": "abu-wuna", "english": "they gave/did", "audio": "audio/abu-wuna.mp3" },
+  { "burarra": "a-ngamngamjinga", "english": "he/she/it tasted", "audio": "audio/a-ngamngamjinga.mp3" },
+  { "burarra": "gu-barra", "english": "unknown", "audio": "audio/gu-barra.mp3" },
+  { "burarra": "gugu", "english": "liquid, drink", "audio": "audio/gugu.mp3" },
+  { "burarra": "mu-ni", "english": "it is/was", "audio": "audio/mu-ni.mp3" },
+  { "burarra": "gala", "english": "not", "audio": "audio/gala.mp3" },
+  { "burarra": "marn.gi", "english": "know", "audio": "audio/marn-gi.mp3" },
+  { "burarra": "yina", "english": "where", "audio": "audio/yina.mp3" },
+  { "burarra": "gaya", "english": "from", "audio": "audio/gaya.mp3" },
+  { "burarra": "wenga", "english": "place", "audio": "audio/wenga.mp3" },
+  { "burarra": "birripa", "english": "they (animate plural)", "audio": "audio/birripa.mp3" },
+  { "burarra": "jarra", "english": "only, just", "audio": "audio/jarra.mp3" },
+  { "burarra": "ngardawa", "english": "first, one", "audio": "audio/ngardawa.mp3" },
+  { "burarra": "gubu-wembarra", "english": "they (thing) filled", "audio": "audio/gubu-wembarra.mp3" },
+  { "burarra": "minypa", "english": "like, as, similar to", "audio": "audio/minypa.mp3" },
+  { "burarra": "an-gurrimapa", "english": "leader, boss", "audio": "audio/an-gurrimapa.mp3" },
+  { "burarra": "a-gonyjinga", "english": "he/she/it called", "audio": "audio/a-gonyjinga.mp3" },
+  { "burarra": "an-gata", "english": "that (animate being)", "audio": "audio/an-gata.mp3" },
+  { "burarra": "gochila gochila", "english": "child, small", "audio": "audio/gochila-gochila.mp3" },
+  { "burarra": "an-gurra", "english": "unknown (animate)", "audio": "audio/an-gurra.mp3" },
+  { "burarra": "ana-bona", "english": "he/she/it came", "audio": "audio/ana-bona.mp3" },
+  { "burarra": "wolawola", "english": "always", "audio": "audio/wolawola.mp3" },
+  { "burarra": "an-gugaliya", "english": "man", "audio": "audio/an-gugaliya.mp3" },
+  { "burarra": "jin-nigipa", "english": "his/her/its (feminine)", "audio": "audio/jin-nigipa.mp3" },
+  { "burarra": "jin-gurra", "english": "unknown (feminine)", "audio": "audio/jin-gurra.mp3" },
+  { "burarra": "jiny-mangga", "english": "she/it (feminine) gives/does", "audio": "audio/jiny-mangga.mp3" },
+  { "burarra": "a-workiya", "english": "he/she/it worked/did", "audio": "audio/a-workiya.mp3" },
+  { "burarra": "m-barnjinga", "english": "unknown", "audio": "audio/m-barnjinga.mp3" },
+  { "burarra": "mu-ngoyurra", "english": "before, earlier", "audio": "audio/mu-ngoyurra.mp3" },
+  { "burarra": "barrwa", "english": "later", "audio": "audio/barrwa.mp3" },
+  { "burarra": "aburr-durtchinga", "english": "they drink", "audio": "audio/aburr-durtchinga.mp3" },
+  { "burarra": "marr", "english": "very, much", "audio": "audio/marr.mp3" },
+  { "burarra": "mu-yinanga", "english": "it was/is like", "audio": "audio/mu-yinanga.mp3" },
+  { "burarra": "wurra", "english": "but", "audio": "audio/wurra.mp3" },
+  { "burarra": "jarra", "english": "only, just", "audio": "audio/jarra.mp3" },
+  { "burarra": "nginyipa", "english": "you (singular)", "audio": "audio/nginyipa.mp3" },
+  { "burarra": "ny-molamola", "english": "you (singular) are good", "audio": "audio/ny-molamola.mp3" },
+  { "burarra": "ny-barnjinga", "english": "you (singular) know", "audio": "audio/ny-barnjinga.mp3" },
+  { "burarra": "warrpam", "english": "a lot, many", "audio": "audio/warrpam.mp3" },
+  { "burarra": "mu-jarlapuna", "english": "he/she/it created/made", "audio": "audio/mu-jarlapuna.mp3" },
+  { "burarra": "wurpa", "english": "then", "audio": "audio/wurpa.mp3" },
+  { "burarra": "gala", "english": "not", "audio": "audio/gala.mp3" },
+  { "burarra": "ana-ngardapa", "english": "first, one", "audio": "audio/ana-ngardapa.mp3" },
+  { "burarra": "ana-goma", "english": "other", "audio": "audio/ana-goma.mp3" },
+  { "burarra": "gu-negarra", "english": "he/she/it did/made", "audio": "audio/gu-negarra.mp3" },
+  { "burarra": "burr-barlmarrk", "english": "wonderful, amazing", "audio": "audio/burr-barlmarrk.mp3" },
+  { "burarra": "jama", "english": "work, activity", "audio": "audio/jama.mp3" },
+  { "burarra": "gu-gegapa", "english": "he/she/it showed", "audio": "audio/gu-gegapa.mp3" },
+  { "burarra": "gu-gunardiya", "english": "this (thing/it)", "audio": "audio/gu-gunardiya.mp3" },
+  { "burarra": "a-gurdagurdarriyana", "english": "he/she/it showed", "audio": "audio/a-gurdagurdarriyana.mp3" },
+  { "burarra": "gatiya", "english": "there", "audio": "audio/gatiya.mp3" },
+  { "burarra": "gugu", "english": "liquid, drink", "audio": "audio/gugu.mp3" },
+  { "burarra": "aburr-yigipa", "english": "their (animate plural)", "audio": "audio/aburr-yigipa.mp3" },
+  { "burarra": "marr", "english": "very, much", "audio": "audio/marr.mp3" },
+  { "burarra": "aburr-balcha", "english": "they believed", "audio": "audio/aburr-balcha.mp3" },
+  { "burarra": "nula", "english": "to him/her/it", "audio": "audio/nula.mp3" },
+  { "burarra": "wugupa", "english": "with", "audio": "audio/wugupa.mp3" },
+  { "burarra": "jin-nigipa", "english": "his/her/its (feminine)", "audio": "audio/jin-nigipa.mp3" },
+  { "burarra": "mampa niya", "english": "that (animate)", "audio": "audio/mampa-niya.mp3" },
+  { "burarra": "worlapa niya", "english": "his/her/its family", "audio": "audio/worlapa-niya.mp3" },
+  { "burarra": "mola", "english": "also", "audio": "audio/mola.mp3" },
+  { "burarra": "jawina", "english": "children, offspring", "audio": "audio/jawina.mp3" },
+  { "burarra": "birripa", "english": "they (animate plural)", "audio": "audio/birripa.mp3" },
+  { "burarra": "aburr-bupiyana", "english": "they went", "audio": "audio/aburr-bupiyana.mp3" },
+  { "burarra": "gu-rrarnba", "english": "to", "audio": "audio/gu-rrarnba.mp3" },
+  { "burarra": "lika", "english": "then", "audio": "audio/lika.mp3" },
+  { "burarra": "gata", "english": "that (different class)", "audio": "audio/gata.mp3" },
+  { "burarra": "aburr-ninya", "english": "they stayed/were", "audio": "audio/aburr-ninya.mp3" },
+  { "burarra": "gu-yinmiyapa", "english": "for a few", "audio": "audio/gu-yinmiyapa.mp3" },
+  { "burarra": "ngorrngurra", "english": "night, darkness", "audio": "audio/ngorrngurra.mp3" }
 ];
 
+const wordsPerSet = 10;
+let vocabularySets = [];
+for (let i = 0; i < allVocabulary.length; i += wordsPerSet) {
+  vocabularySets.push(allVocabulary.slice(i, i + wordsPerSet));
+}
+
+const menuContainer = document.getElementById('menu');
 const quizContainer = document.getElementById('quiz-container');
 const resultsContainer = document.getElementById('results');
 const scoreDisplay = document.getElementById('score-display');
+let currentSetIndex = -1;
+let currentSet = [];
 let currentQuestionIndex = 0;
-let score = 0;
-let currentAudio; // To keep track of the currently playing audio
+let correctInSet = [];
+let currentAudio;
+let lastTapTime = 0;
+let firstTapElement = null;
+
+function populateMenu() {
+  vocabularySets.forEach((set, index) => {
+    const setButton = document.createElement('button');
+    setButton.textContent = `Set ${index + 1}`;
+    setButton.addEventListener('click', () => startSet(index)); // Use click for mouse
+    menuContainer.appendChild(setButton);
+  });
+}
+
+function startSet(setIndex) {
+  currentSetIndex = setIndex;
+  currentSet = [...vocabularySets[currentSetIndex]];
+  correctInSet = new Array(currentSet.length).fill(false);
+  currentQuestionIndex = 0;
+  menuContainer.style.display = 'none'; // Hide menu
+  quizContainer.classList.remove('hidden');
+  displayQuestion();
+}
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -230,9 +396,60 @@ function playAudio(audioPath) {
   currentAudio.play();
 }
 
+function handleOptionSelect(event, option, correctBurarra, optionButton) {
+  const wordData = allVocabulary.find(item => item.burarra === option);
+  if (wordData && wordData.audio) {
+    playAudio(wordData.audio);
+  }
+  checkAnswer(option, correctBurarra, event.target);
+}
+
+function handleOptionTouch(event, option, correctBurarra, optionButton) {
+  const currentTime = new Date().getTime();
+  const tapDelay = currentTime - lastTapTime;
+  const tappedElement = event.target;
+
+  clearSelection(); //clearSelection(); // Clear any previous selection
+
+  if (tapDelay < 300 && tappedElement === firstTapElement) {
+    // Double tap: Select the option
+    handleOptionSelect(event, option, correctBurarra, tappedElement);
+    lastTapTime = 0;
+    firstTapElement = null;
+  } else {
+    // Single tap: Play audio and mark as selected
+    const wordData = allVocabulary.find(item => item.burarra === option);
+    if (wordData && wordData.audio) {
+      playAudio(wordData.audio);
+    }
+    optionButton.classList.add('selected');
+    firstTapElement = tappedElement;
+    lastTapTime = currentTime;
+    // Clear the first tap element after a delay if no second tap occurs
+    setTimeout(() => {
+      if (firstTapElement === tappedElement && (new Date().getTime() - lastTapTime) > 500) {
+        firstTapElement = null;
+        clearSelection(); // Optionally clear selection if no second tap
+      }
+    }, 400); // Slightly longer than the double-tap threshold
+  }
+}
+
+function clearSelection() {
+  const selected = document.querySelector('.options button.selected');
+  if (selected) {
+    selected.classList.remove('selected');
+  }
+}
+
 function displayQuestion() {
-  scoreDisplay.textContent = `Score: ${score}`;
-  const currentQuestionData = vocabulary[currentQuestionIndex];
+  if (currentQuestionIndex >= currentSet.length) {
+    displaySetResults();
+    return;
+  }
+
+  scoreDisplay.textContent = `Correct: ${correctInSet.filter(c => c).length} / ${currentSet.length}`;
+  const currentQuestionData = currentSet[currentQuestionIndex];
   const questionDiv = document.createElement('div');
   questionDiv.classList.add('question');
 
@@ -247,8 +464,8 @@ function displayQuestion() {
   const allOptions = [correctBurarra];
 
   while (allOptions.length < 4) {
-    const randomIndex = Math.floor(Math.random() * vocabulary.length);
-    const randomBurarraData = vocabulary[randomIndex];
+    const randomIndex = Math.floor(Math.random() * allVocabulary.length);
+    const randomBurarraData = allVocabulary[randomIndex];
     if (!allOptions.includes(randomBurarraData.burarra)) {
       allOptions.push(randomBurarraData.burarra);
     }
@@ -259,11 +476,11 @@ function displayQuestion() {
   allOptions.forEach(option => {
     const optionButton = document.createElement('button');
     optionButton.textContent = option;
-    const wordData = vocabulary.find(item => item.burarra === option);
-    if (wordData && wordData.audio) {
-      optionButton.addEventListener('mouseover', () => playAudio(wordData.audio));
-    }
-    optionButton.addEventListener('click', () => checkAnswer(option, correctBurarra, optionButton));
+    const wordData = allVocabulary.find(item => item.burarra === option);
+    optionButton.addEventListener('touchstart', (event) => handleOptionTouch(event, option, correctBurarra, optionButton));
+    optionButton.addEventListener('click', (event) => { // Add click listener for mouse
+      handleOptionSelect(event, option, correctBurarra, optionButton);
+    });
     optionsDiv.appendChild(optionButton);
   });
 
@@ -276,6 +493,7 @@ function checkAnswer(selectedAnswer, correctAnswer, selectedButton) {
   const optionsButtons = selectedButton.parentNode.querySelectorAll('button');
   optionsButtons.forEach(button => {
     button.disabled = true;
+    button.classList.remove('selected'); // Ensure no lingering selection
     if (button.textContent === correctAnswer) {
       button.classList.add('correct');
     } else if (button.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
@@ -284,31 +502,67 @@ function checkAnswer(selectedAnswer, correctAnswer, selectedButton) {
   });
 
   if (selectedAnswer === correctAnswer) {
-    score++;
-    scoreDisplay.textContent = `Score: ${score}`;
+    correctInSet[currentQuestionIndex] = true;
   }
 
-  currentQuestionIndex++;
-
-  if (currentQuestionIndex < vocabulary.length) {
-    setTimeout(displayQuestion, 1500);
-  } else {
-    displayResults();
-  }
+  setTimeout(() => {
+    currentQuestionIndex++;
+    displayQuestion();
+  }, 1500);
 }
 
-function displayResults() {
-  quizContainer.innerHTML = `<h2>Quiz Finished!</h2><p>Your final score is: ${score} out of ${vocabulary.length}</p>`;
+function displaySetResults() {
+  quizContainer.classList.add('hidden');
+  resultsContainer.classList.remove('hidden');
+  resultsContainer.innerHTML = `<h2>Set ${currentSetIndex + 1} Results</h2>`;
+  const incorrectWords = currentSet.filter((word, index) => !correctInSet[index]);
+
+  if (incorrectWords.length === 0) {
+    resultsContainer.innerHTML += `<p>Congratulations! You got all words in this set correct.</p>`;
+  } else {
+    resultsContainer.innerHTML += `<p>You still have some to learn:</p><ul>`;
+    incorrectWords.forEach(word => {
+      resultsContainer.innerHTML += `<li>${word.english} - ${word.burarra}</li>`;
+    });
+    resultsContainer.innerHTML += `</ul><p>Try again to master this set!</p>`;
+  }
+
+  const retryButton = document.createElement('button');
+  retryButton.textContent = `Retry Set ${currentSetIndex + 1}`;
+  retryButton.addEventListener('click', () => { // Use click for mouse
+    resultsContainer.classList.add('hidden');
+    menuContainer.style.display = 'block'; // Show menu again
+    startSet(currentSetIndex);
+  });
+  retryButton.addEventListener('touchstart', () => { // Use touchstart for touch
+    resultsContainer.classList.add('hidden');
+    menuContainer.style.display = 'block'; // Show menu again
+    startSet(currentSetIndex);
+  });
+  resultsContainer.appendChild(retryButton);
+
+  const menuButton = document.createElement('button');
+  menuButton.textContent = 'Back to Menu';
+  menuButton.addEventListener('click', () => { // Use click for mouse
+    resultsContainer.classList.add('hidden');
+    menuContainer.style.display = 'block';
+  });
+  menuButton.addEventListener('touchstart', () => { // Use touchstart for touch
+    resultsContainer.classList.add('hidden');
+    menuContainer.style.display = 'block';
+  });
+  resultsContainer.appendChild(menuButton);
+
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.currentTime = 0;
   }
+  lastTapTime = 0; // Reset tap time when results are shown
+  firstTapElement = null;
 }
 
-// Start the quiz
-shuffleArray(vocabulary);
-displayQuestion();
-
+// Start by populating the menu
+populateMenu();
 </script>
 
 </body>
