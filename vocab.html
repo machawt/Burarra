@@ -1,179 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Burarra Vocabulary Quiz</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body {
-    font-family: sans-serif;
-    margin: 0;
-    background-color: #f4f4f4;
-    color: #333;
-    -webkit-tap-highlight-color: transparent; /* Remove default tap highlight */
-  }
-  #menu, #quiz-container, #results {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  #menu h2, #quiz-container h2, #results h2 {
-    color: #555;
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  #menu button {
-    display: block;
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  #menu button:hover {
-    background-color: #0056b3;
-  }
-  .question {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #eee;
-  }
-  .question h2 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-    text-align: left;
-  }
-  .options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .options button {
-    flex: 1 1 calc(50% - 5px); /* Two buttons per row on wider screens */
-    padding: 10px 15px;
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  .options button:hover {
-    background-color: #f0f0f0;
-  }
-  .options button.correct {
-    background-color: lightgreen;
-    border-color: darkgreen;
-    color: darkgreen;
-  }
-  .options button.incorrect {
-    background-color: lightcoral;
-    border-color: darkred;
-    color: darkred;
-  }
-  #score-display {
-    margin-bottom: 15px;
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.1em;
-  }
-  #results p {
-    line-height: 1.6;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  #results ul {
-    list-style-type: none;
-    padding: 0;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  #results li {
-    margin-bottom: 5px;
-  }
-  #results button {
-    display: inline-block;
-    padding: 10px 15px;
-    margin-right: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  #results button:last-child {
-    background-color: #007bff;
-  }
-  #results button:hover {
-    background-color: #1e7e34;
-  }
-  #results button:last-child:hover {
-    background-color: #0056b3;
-  }
-  .selected {
-    border: 3px solid blue !important;
-  }
-
-  /* Media query for smaller screens (e.g., phones) */
-  @media (max-width: 480px) {
-    #menu, #quiz-container, #results {
-      margin: 15px;
-      padding: 15px;
-      border-radius: 5px;
-    }
-    #menu h2, #quiz-container h2, #results h2 {
-      font-size: 1.1em;
-      margin-bottom: 10px;
-    }
-    .options button {
-      flex: 1 1 100%; /* One button per row on small screens */
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    #score-display {
-      font-size: 1em;
-      margin-bottom: 10px;
-    }
-    #results p, #results li {
-      font-size: 0.95em;
-    }
-    #results button {
-      font-size: 14px;
-      padding: 8px 12px;
-      margin-right: 5px;
-      margin-bottom: 5px;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Burarra Vocabulary Game</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+        
+        .menu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        
+        .game-container { 
+            display: none; 
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        button { 
+            padding: 14px 10px; 
+            margin: 6px; 
+            cursor: pointer; 
+            font-size: 0.95em;
+            border: none;
+            border-radius: 8px;
+            background: #007bff;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        
+        button:active {
+            opacity: 0.8;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            font-size: 16px;
+            box-sizing: border-box;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        #soundButton {
+            background: #28a745;
+            padding: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .menu {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            button {
+                font-size: 0.85em;
+                padding: 12px 8px;
+            }
+            #question {
+                font-size: 1.6em;
+                margin: 20px 0;
+                text-align: center;
+            }
+            .game-container {
+                padding: 15px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .menu {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+        
+        .correct { color: #28a745; }
+        .wrong { color: #dc3545; }
+        #progress { 
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+        }
+        #feedback {
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+    </style>
 </head>
 <body>
+    <div class="menu" id="setMenu"></div>
+    
+    <div class="game-container" id="gameContainer">
+        <h2 id="currentSet"></h2>
+        <div id="question"></div>
+        <button id="soundButton" style="display: none;">
+            <span>🔊 Play Sound</span>
+        </button>
+        <input type="text" id="answerInput" placeholder="Type Burarra word" autocomplete="off">
+        <button onclick="checkAnswer()">Submit Answer</button>
+        <div id="feedback"></div>
+        <div id="progress"></div>
+    </div>
 
-<h1>Burarra Vocabulary Quiz</h1>
+    <script>
+        // Prevents zoom on input focus
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
-<div id="menu">
-  <h2>Choose a Vocabulary Set:</h2>
-</div>
+        // Sample data structure - replace with actual words
+        const allWords = [
+            // Set 1
+            [
+                { english: "Man", burarra: "Gunana", sound: "man.mp3" },
+                { english: "Woman", burarra: "Alawa", sound: "woman.mp3" },
+                // Add 8 more words...
+            ],
+            // Set 2
+            [
+                { english: "Water", burarra: "Guku", sound: "water.mp3" },
+                // Add 9 more words...
+            ],
+            // Add 18 more sets...
+        ];
 
-<div id="quiz-container" class="hidden">
-  <div id="score-display"></div>
-</div>
+        let currentSet = null;
+        let currentWordIndex = 0;
+        let score = 0;
+        let errors = [];
+        let activeWords = [];
 
-<div id="results" class="hidden"></div>
+        function initializeMenu() {
+            const menu = document.getElementById('setMenu');
+            allWords.forEach((set, index) => {
+                const btn = document.createElement('button');
+                btn.textContent = `Set ${index + 1}`;
+                btn.onclick = () => startSet(index);
+                menu.appendChild(btn);
+            });
+        }
 
-<script>
-const allVocabulary = [
-  { "burarra": "Jesus", "english": "Jesus", "audio": "audio/jesus.mp3" },
+        function startSet(setIndex) {
+            currentSet = setIndex;
+            activeWords = [...allWords[setIndex]];
+            currentWordIndex = 0;
+            score = 0;
+            errors = [];
+            
+            document.getElementById('setMenu').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            document.getElementById('currentSet').textContent = `Set ${setIndex + 1}`;
+            
+            showNextWord();
+            updateProgress();
+        }
+
+        function showNextWord() {
+            const questionEl = document.getElementById('question');
+            const soundBtn = document.getElementById('soundButton');
+            
+            questionEl.textContent = activeWords[currentWordIndex].english;
+            
+            if (activeWords[currentWordIndex].sound) {
+                soundBtn.style.display = 'inline-block';
+                soundBtn.onclick = () => playSound(activeWords[currentWordIndex].sound);
+            } else {
+                soundBtn.style.display = 'none';
+            }
+            
+            document.getElementById('answerInput').focus();
+        }
+
+        function playSound(soundFile) {
+            new Audio(soundFile).play().catch(error => {
+                console.log('Sound playback error:', error);
+            });
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim();
+            const correctAnswer = activeWords[currentWordIndex].burarra;
+            const feedbackEl = document.getElementById('feedback');
+
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedbackEl.innerHTML = `<span class="correct">Correct! ${correctAnswer}</span>`;
+                score++;
+            } else {
+                feedbackEl.innerHTML = `<span class="wrong">Incorrect. The answer was: ${correctAnswer}</span>`;
+                errors.push(activeWords[currentWordIndex]);
+            }
+
+            currentWordIndex++;
+            document.getElementById('answerInput').value = '';
+            updateProgress();
+
+            if (currentWordIndex < activeWords.length) {
+                showNextWord();
+            } else {
+                endSession();
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = 
+                `Progress: ${currentWordIndex}/${activeWords.length} | Score: ${score}`;
+        }
+
+        function endSession() {
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.innerHTML += `<p style="margin-top: 15px;">Session Complete! Final Score: ${score}/${activeWords.length}</p>`;
+
+            if (errors.length > 0) {
+                const retryBtn = document.createElement('button');
+                retryBtn.textContent = 'Practice Mistakes';
+                retryBtn.onclick = retryErrors;
+                feedbackEl.appendChild(retryBtn);
+            }
+
+            const menuBtn = document.createElement('button');
+            menuBtn.textContent = 'Return to Menu';
+            menuBtn.style.marginTop = '10px';
+            menuBtn.onclick = () => {
+                document.getElementById('setMenu').style.display = 'grid';
+                document.getElementById('gameContainer').style.display = 'none';
+                feedbackEl.innerHTML = '';
+            };
+            feedbackEl.appendChild(menuBtn);
+        }
+
+        function retryErrors() {
+            activeWords = [...errors];
+            errors = [];
+            currentWordIndex = 0;
+            score = 0;
+            document.getElementById('feedback').innerHTML = '';
+            showNextWord();
+            updateProgress();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeMenu();
+            document.getElementById('answerInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkAnswer();
+            });
+        });
+    </script>
+</body>
+</html> 
+/*{ "burarra": "Jesus", "english": "Jesus", "audio": "audio/jesus.mp3" },
   { "burarra": "Bugula", "english": "ground, dirt", "audio": "audio/bugula.mp3" },
   { "burarra": "Gu-jarlapuna", "english": "he/she/it created/made", "audio": "audio/gu-jarlapuna.mp3" },
   { "burarra": "Gurnal", "english": "unknown", "audio": "audio/gurnal.mp3" },
@@ -342,228 +434,4 @@ const allVocabulary = [
   { "burarra": "gu-yinmiyapa", "english": "for a few", "audio": "audio/gu-yinmiyapa.mp3" },
   { "burarra": "ngorrngurra", "english": "night, darkness", "audio": "audio/ngorrngurra.mp3" }
 ];
-
-const wordsPerSet = 10;
-let vocabularySets = [];
-for (let i = 0; i < allVocabulary.length; i += wordsPerSet) {
-  vocabularySets.push(allVocabulary.slice(i, i + wordsPerSet));
-}
-
-const menuContainer = document.getElementById('menu');
-const quizContainer = document.getElementById('quiz-container');
-const resultsContainer = document.getElementById('results');
-const scoreDisplay = document.getElementById('score-display');
-let currentSetIndex = -1;
-let currentSet = [];
-let currentQuestionIndex = 0;
-let correctInSet = [];
-let currentAudio;
-let lastTapTime = 0;
-let firstTapElement = null;
-
-function populateMenu() {
-  vocabularySets.forEach((set, index) => {
-    const setButton = document.createElement('button');
-    setButton.textContent = `Set ${index + 1}`;
-    setButton.addEventListener('click', () => startSet(index)); // Use click for mouse
-    menuContainer.appendChild(setButton);
-  });
-}
-
-function startSet(setIndex) {
-  currentSetIndex = setIndex;
-  currentSet = [...vocabularySets[currentSetIndex]];
-  correctInSet = new Array(currentSet.length).fill(false);
-  currentQuestionIndex = 0;
-  menuContainer.style.display = 'none'; // Hide menu
-  quizContainer.classList.remove('hidden');
-  displayQuestion();
-}
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-function playAudio(audioPath) {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-  }
-  currentAudio = new Audio(audioPath);
-  currentAudio.play();
-}
-
-function handleOptionSelect(event, option, correctBurarra, optionButton) {
-  const wordData = allVocabulary.find(item => item.burarra === option);
-  if (wordData && wordData.audio) {
-    playAudio(wordData.audio);
-  }
-  checkAnswer(option, correctBurarra, event.target);
-}
-
-function handleOptionTouch(event, option, correctBurarra, optionButton) {
-  const currentTime = new Date().getTime();
-  const tapDelay = currentTime - lastTapTime;
-  const tappedElement = event.target;
-
-  clearSelection(); //clearSelection(); // Clear any previous selection
-
-  if (tapDelay < 300 && tappedElement === firstTapElement) {
-    // Double tap: Select the option
-    handleOptionSelect(event, option, correctBurarra, tappedElement);
-    lastTapTime = 0;
-    firstTapElement = null;
-  } else {
-    // Single tap: Play audio and mark as selected
-    const wordData = allVocabulary.find(item => item.burarra === option);
-    if (wordData && wordData.audio) {
-      playAudio(wordData.audio);
-    }
-    optionButton.classList.add('selected');
-    firstTapElement = tappedElement;
-    lastTapTime = currentTime;
-    // Clear the first tap element after a delay if no second tap occurs
-    setTimeout(() => {
-      if (firstTapElement === tappedElement && (new Date().getTime() - lastTapTime) > 500) {
-        firstTapElement = null;
-        clearSelection(); // Optionally clear selection if no second tap
-      }
-    }, 400); // Slightly longer than the double-tap threshold
-  }
-}
-
-function clearSelection() {
-  const selected = document.querySelector('.options button.selected');
-  if (selected) {
-    selected.classList.remove('selected');
-  }
-}
-
-function displayQuestion() {
-  if (currentQuestionIndex >= currentSet.length) {
-    displaySetResults();
-    return;
-  }
-
-  scoreDisplay.textContent = `Correct: ${correctInSet.filter(c => c).length} / ${currentSet.length}`;
-  const currentQuestionData = currentSet[currentQuestionIndex];
-  const questionDiv = document.createElement('div');
-  questionDiv.classList.add('question');
-
-  const englishWord = document.createElement('h2');
-  englishWord.textContent = currentQuestionData.english;
-  questionDiv.appendChild(englishWord);
-
-  const optionsDiv = document.createElement('div');
-  optionsDiv.classList.add('options');
-
-  const correctBurarra = currentQuestionData.burarra;
-  const allOptions = [correctBurarra];
-
-  while (allOptions.length < 4) {
-    const randomIndex = Math.floor(Math.random() * allVocabulary.length);
-    const randomBurarraData = allVocabulary[randomIndex];
-    if (!allOptions.includes(randomBurarraData.burarra)) {
-      allOptions.push(randomBurarraData.burarra);
-    }
-  }
-
-  shuffleArray(allOptions);
-
-  allOptions.forEach(option => {
-    const optionButton = document.createElement('button');
-    optionButton.textContent = option;
-    const wordData = allVocabulary.find(item => item.burarra === option);
-    optionButton.addEventListener('touchstart', (event) => handleOptionTouch(event, option, correctBurarra, optionButton));
-    optionButton.addEventListener('click', (event) => { // Add click listener for mouse
-      handleOptionSelect(event, option, correctBurarra, optionButton);
-    });
-    optionsDiv.appendChild(optionButton);
-  });
-
-  questionDiv.appendChild(optionsDiv);
-  quizContainer.innerHTML = '';
-  quizContainer.appendChild(questionDiv);
-}
-
-function checkAnswer(selectedAnswer, correctAnswer, selectedButton) {
-  const optionsButtons = selectedButton.parentNode.querySelectorAll('button');
-  optionsButtons.forEach(button => {
-    button.disabled = true;
-    button.classList.remove('selected'); // Ensure no lingering selection
-    if (button.textContent === correctAnswer) {
-      button.classList.add('correct');
-    } else if (button.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
-      button.classList.add('incorrect');
-    }
-  });
-
-  if (selectedAnswer === correctAnswer) {
-    correctInSet[currentQuestionIndex] = true;
-  }
-
-  setTimeout(() => {
-    currentQuestionIndex++;
-    displayQuestion();
-  }, 1500);
-}
-
-function displaySetResults() {
-  quizContainer.classList.add('hidden');
-  resultsContainer.classList.remove('hidden');
-  resultsContainer.innerHTML = `<h2>Set ${currentSetIndex + 1} Results</h2>`;
-  const incorrectWords = currentSet.filter((word, index) => !correctInSet[index]);
-
-  if (incorrectWords.length === 0) {
-    resultsContainer.innerHTML += `<p>Congratulations! You got all words in this set correct.</p>`;
-  } else {
-    resultsContainer.innerHTML += `<p>You still have some to learn:</p><ul>`;
-    incorrectWords.forEach(word => {
-      resultsContainer.innerHTML += `<li>${word.english} - ${word.burarra}</li>`;
-    });
-    resultsContainer.innerHTML += `</ul><p>Try again to master this set!</p>`;
-  }
-
-  const retryButton = document.createElement('button');
-  retryButton.textContent = `Retry Set ${currentSetIndex + 1}`;
-  retryButton.addEventListener('click', () => { // Use click for mouse
-    resultsContainer.classList.add('hidden');
-    menuContainer.style.display = 'block'; // Show menu again
-    startSet(currentSetIndex);
-  });
-  retryButton.addEventListener('touchstart', () => { // Use touchstart for touch
-    resultsContainer.classList.add('hidden');
-    menuContainer.style.display = 'block'; // Show menu again
-    startSet(currentSetIndex);
-  });
-  resultsContainer.appendChild(retryButton);
-
-  const menuButton = document.createElement('button');
-  menuButton.textContent = 'Back to Menu';
-  menuButton.addEventListener('click', () => { // Use click for mouse
-    resultsContainer.classList.add('hidden');
-    menuContainer.style.display = 'block';
-  });
-  menuButton.addEventListener('touchstart', () => { // Use touchstart for touch
-    resultsContainer.classList.add('hidden');
-    menuContainer.style.display = 'block';
-  });
-  resultsContainer.appendChild(menuButton);
-
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-  }
-  lastTapTime = 0; // Reset tap time when results are shown
-  firstTapElement = null;
-}
-
-// Start by populating the menu
-populateMenu();
-</script>
-
-</body>
-</html>
+*/
