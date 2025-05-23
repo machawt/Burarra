@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Burarra Vocabulary Quiz</title>
   <style>
     body {
@@ -22,7 +21,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
     }
-    input, button {
+    input, button, select {
       font-size: 1.2rem;
       padding: 0.5rem;
       margin-top: 0.5rem;
@@ -39,6 +38,11 @@
 <body>
   <h2>Burarra Word Quiz</h2>
   <div id="quiz-box">
+    <label for="setSelect">Choose a Set:</label>
+    <select id="setSelect" onchange="startSelectedSet()">
+      <option value="">-- Select Set --</option>
+    </select>
+
     <p id="prompt"></p>
     <button onclick="playSound()">Play Sound</button>
     <input type="text" id="answerInput" placeholder="Type Burarra word here">
@@ -49,20 +53,36 @@
   <script>
     const sets = [
       [
-        ["man", "wägirr"], ["woman", "djämba"], ["child", "bala"], ["sun", "wurrpa"],
-        ["moon", "gurrpi"], ["water", "burrku"], ["fire", "garlak"], ["tree", "marrpi"],
-        ["fish", "guya"], ["dog", "wakal"]
+        ["man", "wägirr", "wagirr.mp3"],
+        ["woman", "djämba", "djamba.mp3"],
+        ["child", "bala", "bala.mp3"],
+        ["sun", "wurrpa", "wurrpa.mp3"],
+        ["moon", "gurrpi", "gurrpi.mp3"],
+        ["water", "burrku", "burrku.mp3"],
+        ["fire", "garlak", "garlak.mp3"],
+        ["tree", "marrpi", "marrpi.mp3"],
+        ["fish", "guya", "guya.mp3"],
+        ["dog", "wakal", "wakal.mp3"]
       ],
       [
-        ["house", "balku"], ["food", "murru"], ["snake", "djalwa"], ["bird", "gurra"],
-        ["kangaroo", "malba"], ["rain", "yurrku"], ["star", "djuka"], ["rock", "warrka"],
-        ["spear", "djaka"], ["blood", "garrak"]
+        ["house", "balku", "balku.mp3"],
+        ["food", "murru", "murru.mp3"],
+        ["snake", "djalwa", "djalwa.mp3"],
+        ["bird", "gurra", "gurra.mp3"],
+        ["kangaroo", "malba", "malba.mp3"],
+        ["rain", "yurrku", "yurrku.mp3"],
+        ["star", "djuka", "djuka.mp3"],
+        ["rock", "warrka", "warrka.mp3"],
+        ["spear", "djaka", "djaka.mp3"],
+        ["blood", "garrak", "garrak.mp3"]
       ]
     ];
 
-    let currentSet = 0;
+    let currentSet = [];
+    let setIndex = 0;
     let currentWord = 0;
-    let score = 0;
+    let correct = 0;
+    let wrong = 0;
     let errors = [];
     let retryMode = false;
     let retryIndex = 0;
@@ -70,17 +90,40 @@
     const prompt = document.getElementById("prompt");
     const input = document.getElementById("answerInput");
     const scoreBox = document.getElementById("score");
+    const setSelect = document.getElementById("setSelect");
+
+    // Populate dropdown
+    sets.forEach((_, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `Set ${i + 1}`;
+      setSelect.appendChild(opt);
+    });
+
+    function startSelectedSet() {
+      setIndex = parseInt(setSelect.value);
+      if (isNaN(setIndex)) return;
+      currentSet = sets[setIndex];
+      currentWord = 0;
+      correct = 0;
+      wrong = 0;
+      errors = [];
+      retryMode = false;
+      retryIndex = 0;
+      input.disabled = false;
+      loadWord();
+    }
 
     function getCurrentWordObj() {
-      return retryMode ? errors[retryIndex] : sets[currentSet][currentWord];
+      return retryMode ? errors[retryIndex] : currentSet[currentWord];
     }
 
     function playSound() {
-      const word = getCurrentWordObj()[1];
-      const audio = new Audio(`sound/${word}.mp3`);
+      const soundFile = getCurrentWordObj()[2];
+      const audio = new Audio(`sound/${soundFile}`);
       audio.play().catch(err => {
         console.log("Audio error:", err);
-        alert("Audio not found for: " + word);
+        alert("Audio not found: " + soundFile);
       });
     }
 
@@ -91,66 +134,66 @@
       if (retryMode) {
         if (retryIndex >= errors.length) {
           scoreBox.innerHTML += `<br>All errors corrected!`;
-          errors = [];
           retryMode = false;
-          currentSet++;
+          retryIndex = 0;
           currentWord = 0;
-          score = 0;
+          loadWord();
+          return;
         } else {
           prompt.innerText = `Retry: English for "${errors[retryIndex][0]}"`;
+          updateScore();
           return;
         }
       }
 
-      if (currentSet >= sets.length) {
-        prompt.innerText = "Quiz finished!";
-        scoreBox.innerText += "<br>Well done!";
-        input.disabled = true;
-        return;
-      }
-
-      if (currentWord >= sets[currentSet].length) {
+      if (currentWord >= currentSet.length) {
         if (errors.length > 0) {
           retryMode = true;
           retryIndex = 0;
           loadWord();
         } else {
-          scoreBox.innerHTML += `<br>Set ${currentSet + 1} complete. Score: ${score}/10`;
-          currentSet++;
-          currentWord = 0;
-          score = 0;
-          loadWord();
+          prompt.innerText = `Set ${setIndex + 1} complete.`;
+          input.disabled = true;
+          updateScore();
         }
         return;
       }
 
-      const english = sets[currentSet][currentWord][0];
+      const english = currentSet[currentWord][0];
       prompt.innerText = `What is the Burarra word for "${english}"?`;
+      updateScore();
     }
 
     function submitAnswer() {
       const userInput = input.value.trim().toLowerCase();
+      if (!userInput) return;
+
       if (retryMode) {
-        const [eng, correct] = errors[retryIndex];
-        if (userInput === correct) {
+        const [eng, correctWord, _] = errors[retryIndex];
+        if (userInput === correctWord) {
+          correct++;
           retryIndex++;
-          loadWord();
         } else {
           alert("Try again!");
+          return;
         }
       } else {
-        const [eng, correct] = sets[currentSet][currentWord];
-        if (userInput === correct) {
-          score++;
+        const [eng, correctWord, soundFile] = currentSet[currentWord];
+        if (userInput === correctWord) {
+          correct++;
         } else {
-          errors.push([eng, correct]);
+          wrong++;
+          errors.push([eng, correctWord, soundFile]);
         }
         currentWord++;
-        loadWord();
       }
+
+      loadWord();
     }
 
-    loadWord();
+    function updateScore() {
+      scoreBox.innerHTML = `Correct: ${correct} | Wrong: ${wrong}`;
+    }
   </script>
 </body>
 </html>
