@@ -1,1 +1,156 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Burarra Vocabulary Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f7f7f7;
+    }
+    h2 {
+      text-align: center;
+    }
+    #quiz-box {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    input, button {
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #score {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>Burarra Word Quiz</h2>
+  <div id="quiz-box">
+    <p id="prompt"></p>
+    <button onclick="playSound()">Play Sound</button>
+    <input type="text" id="answerInput" placeholder="Type Burarra word here">
+    <button onclick="submitAnswer()">Submit</button>
+    <div id="score"></div>
+  </div>
+
+  <script>
+    const sets = [
+      [
+        ["man", "wägirr"], ["woman", "djämba"], ["child", "bala"], ["sun", "wurrpa"],
+        ["moon", "gurrpi"], ["water", "burrku"], ["fire", "garlak"], ["tree", "marrpi"],
+        ["fish", "guya"], ["dog", "wakal"]
+      ],
+      [
+        ["house", "balku"], ["food", "murru"], ["snake", "djalwa"], ["bird", "gurra"],
+        ["kangaroo", "malba"], ["rain", "yurrku"], ["star", "djuka"], ["rock", "warrka"],
+        ["spear", "djaka"], ["blood", "garrak"]
+      ]
+    ];
+
+    let currentSet = 0;
+    let currentWord = 0;
+    let score = 0;
+    let errors = [];
+    let retryMode = false;
+    let retryIndex = 0;
+
+    const prompt = document.getElementById("prompt");
+    const input = document.getElementById("answerInput");
+    const scoreBox = document.getElementById("score");
+
+    function getCurrentWordObj() {
+      return retryMode ? errors[retryIndex] : sets[currentSet][currentWord];
+    }
+
+    function playSound() {
+      const word = getCurrentWordObj()[1];
+      const audio = new Audio(`sound/${word}.mp3`);
+      audio.play().catch(err => {
+        console.log("Audio error:", err);
+        alert("Audio not found for: " + word);
+      });
+    }
+
+    function loadWord() {
+      input.value = "";
+      input.focus();
+
+      if (retryMode) {
+        if (retryIndex >= errors.length) {
+          scoreBox.innerHTML += `<br>All errors corrected!`;
+          errors = [];
+          retryMode = false;
+          currentSet++;
+          currentWord = 0;
+          score = 0;
+        } else {
+          prompt.innerText = `Retry: English for "${errors[retryIndex][0]}"`;
+          return;
+        }
+      }
+
+      if (currentSet >= sets.length) {
+        prompt.innerText = "Quiz finished!";
+        scoreBox.innerText += "<br>Well done!";
+        input.disabled = true;
+        return;
+      }
+
+      if (currentWord >= sets[currentSet].length) {
+        if (errors.length > 0) {
+          retryMode = true;
+          retryIndex = 0;
+          loadWord();
+        } else {
+          scoreBox.innerHTML += `<br>Set ${currentSet + 1} complete. Score: ${score}/10`;
+          currentSet++;
+          currentWord = 0;
+          score = 0;
+          loadWord();
+        }
+        return;
+      }
+
+      const english = sets[currentSet][currentWord][0];
+      prompt.innerText = `What is the Burarra word for "${english}"?`;
+    }
+
+    function submitAnswer() {
+      const userInput = input.value.trim().toLowerCase();
+      if (retryMode) {
+        const [eng, correct] = errors[retryIndex];
+        if (userInput === correct) {
+          retryIndex++;
+          loadWord();
+        } else {
+          alert("Try again!");
+        }
+      } else {
+        const [eng, correct] = sets[currentSet][currentWord];
+        if (userInput === correct) {
+          score++;
+        } else {
+          errors.push([eng, correct]);
+        }
+        currentWord++;
+        loadWord();
+      }
+    }
+
+    loadWord();
+  </script>
+</body>
+</html>
